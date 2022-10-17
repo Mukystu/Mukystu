@@ -1,0 +1,98 @@
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from dataclasses import dataclass, field
+def data(data):
+    df = pd.read_csv("R_47KR_uhlikovy_1MHz-3GHz.csv", sep=',',decimal=".")
+    return df
+class LCR_NAMEREANE:
+    def __init__(self,FrekvenciaLCR,MagnitudaLCR,PhaseLCR):
+        self.FrekvenciaLCR=frekvencia()
+        self.MagnitudaLCR=Magnitude()
+        self.PhaseLCR=Faza()
+
+
+def frekvencia():
+    df=data(data)
+
+    #df['Frequency (Hz)'] = (df['Frequency (Hz)'].str.replace(',', '.').astype(float))
+    # x=df['Frequency (Hz)']
+
+    #x=df.filter(like='Mag')
+    x = df.columns[df.columns.str.contains("Frequency")]
+    f=df[x]
+
+    #x=f.rename(columns={'Frequency (Hz)': '',})
+    #z = (f.apply(lambda x: x.replace(',', '.')).astype(float))
+
+    return f
+
+
+def Magnitude():
+    df=data(data)
+  #  (df['Trace 1: Impedance: Magnitude (Ω)'] = (df['Trace 1: Impedance: Magnitude (Ω)'].str.replace(',', '.').astype(float))
+    #y=df['Trace 1: Impedance: Magnitude (Ω)']
+   # if y.empty:
+  #     pass
+   # else:
+
+    #    return y
+
+   # return z
+
+    x = df.columns[df.columns.str.contains("1: |Z| [Ω]")]
+    f = df[x]
+
+    # x=f.rename(columns={'Frequency (Hz)': '',})
+    z = (f.apply(lambda x: x.replace(',', '.')).astype(float))
+
+    return z
+def Faza():
+    df = data(data)
+   #df["Trace 2: Impedance: Phase (°)"] = (df['Trace 2: Impedance: Phase (°)'].str.replace(',', '.').astype(float))
+    #y2=df["Trace 2: Impedance: Phase (°)"]
+    #if y2.empty:
+    #    pass
+   # else:
+  #      return y2
+    x = df.columns[df.columns.str.contains("θz")]
+    f = df[x]
+
+   # x=f.rename(columns={'Frequency (Hz)': '',})
+    z = (f.apply(lambda x: x.replace(',', '.')).astype(float))
+
+    return z
+
+
+def Graf():
+    fig = plt.figure(figsize=(11, 7))
+    ax = fig.add_subplot(111)
+    ax2 = ax.twinx()
+
+    # ax2.set_ylim([-100, 100])
+    x = frekvencia()
+    y = Magnitude()
+    y2 = Faza()
+
+    ax.plot(x, y, "g-", linewidth=2)
+    ax2.plot(x, y2, "b", linewidth=2)
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+    ax.set_xlabel("Frekvencia [Hz]", fontsize=14)
+    ax.set_ylabel("Impedancia [Ω]", color='g', fontsize=14)
+    ax2.set_ylabel("Fáza [°]", color='b', fontsize=14)
+    # plt.grid(True, which="both", ls="-")
+
+    ax.grid(True, axis='both')
+    ax2.grid(True, axis='y')
+
+    plt.show()
+
+
+
+Graf()
+
+Z=LCR_NAMEREANE(frekvencia(),Magnitude(),Faza())
+print(Z.MagnitudaLCR)
